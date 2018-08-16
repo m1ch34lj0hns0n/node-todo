@@ -8,7 +8,7 @@ const { mongoose } = require('./db/mongoose');
 const { User } = require('./model/User')
 const { Todo } = require('./model/todo');
 
-const port = process.env || 3000;
+const port = process.env.PORT || 3000;
 
 const app = express();
 
@@ -59,6 +59,28 @@ app.delete('/api/todos/:id', (request, response) => {
             status: 'ok'
         });
     }).catch(error => response.status(404).send());
+});
+
+app.patch('/api/todos/:id', (request, response) => {
+    const id = request.params.id;
+    let todo = request.body;
+    if(!ObjectID.isValid(id)) {
+        response.status(404).send();
+    }
+    if(typeof todo.completed === 'boolean' && todo.completed) {
+        todo.completedAt = new Date().getTime();
+    } else {
+        todo.completed = false;
+        todo.completedAt = null;
+    }
+    Todo.findOneAndUpdate(id, {
+        $set: todo
+    }, {
+        new: true
+    }).then(todo => {
+        if(!todo) return response.status(404).send();
+        response.send({todo});
+    }).catch(error => res.status(400).send());
 });
 
 app.listen(port, () => console.log(`Server: http://localhost:${port}`));

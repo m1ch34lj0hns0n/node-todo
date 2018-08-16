@@ -21,7 +21,12 @@ app.post('/api/todos', (request, response) => {
 });
 
 app.get('/api/todos', (request, response) => {
-    console.log(request.body);
+    Todo.find().then(todos => {
+        response.send({
+            todos,
+            status: 'ok'
+        });
+    }, error => response.status(400).send(error));
 });
 
 app.listen(3001, () => console.log('Server: http://localhost:3000'))

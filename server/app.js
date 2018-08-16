@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const { ObjectID } = require('mongodb');
 const bodyParser = require('body-parser');
@@ -6,6 +7,8 @@ const { mongoose } = require('./db/mongoose');
 
 const { User } = require('./model/User')
 const { Todo } = require('./model/todo');
+
+const port = process.env || 3000;
 
 const app = express();
 
@@ -58,4 +61,4 @@ app.delete('/api/todos/:id', (request, response) => {
     }).catch(error => response.status(404).send());
 });
 
-app.listen(3001, () => console.log('Server: http://localhost:3000'))
+app.listen(port, () => console.log(`Server: http://localhost:${port}`));

@@ -44,4 +44,18 @@ app.get('/api/todos/:id', (request, response) => {
     }).catch(error => response.status(404).send());
 });
 
+app.delete('/api/todos/:id', (request, response) => {
+    const id = request.params.id;
+    if(!ObjectID.isValid(id)) {
+        response.status(404).send();
+    }
+    Todo.findByIdAndRemove(id).then(todo => {
+        if(!todo) return response.status(404).send();
+        response.send({
+            todo,
+            status: 'ok'
+        });
+    }).catch(error => response.status(404).send());
+});
+
 app.listen(3001, () => console.log('Server: http://localhost:3000'))

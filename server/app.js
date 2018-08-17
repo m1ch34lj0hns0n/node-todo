@@ -98,4 +98,15 @@ app.get('/users/me', authenticate, (request, response) => {
     response.send(request.user);
 });
 
+app.post('/users/login', (request, response) => {
+    var body = {
+        email: request.body.email,
+        password: request.body.password
+    };
+    User.findByCredentials(body.email, body.password).then(user => {
+        if(!user) return response.status('401').send();
+        return user.generateAuthToken().then(token => response.header('x-auth', token).send(user));
+    }).catch(error => response.status('401').send());
+});
+
 app.listen(port, () => console.log(`Server: http://localhost:${port}`));

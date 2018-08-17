@@ -109,4 +109,8 @@ app.post('/users/login', (request, response) => {
     }).catch(error => response.status('401').send());
 });
 
+app.delete('/users/logout', authenticate, (request, response) => {
+    request.user.removeToken(request.token).then(() => response.status(200).send(), () => response.status(400).send());
+});
+
 app.listen(port, () => console.log(`Server: http://localhost:${port}`));

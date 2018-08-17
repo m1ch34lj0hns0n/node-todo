@@ -18,7 +18,6 @@ app.post('/api/todos', (request, response) => {
     const todo = new Todo({
         text: request.body.text
     });
-
     todo.save().then(document => {
         response.send(document);
     }, error => response.status(400).send(error));
@@ -81,6 +80,16 @@ app.patch('/api/todos/:id', (request, response) => {
         if(!todo) return response.status(404).send();
         response.send({todo});
     }).catch(error => res.status(400).send());
+});
+
+app.post('/users', (request, response) => {
+    const user = new User({
+        email: request.body.email,
+        password: request.body.password
+    });
+    user.save().then(() => user.generateAuthToken())
+    .then(token => response.header('x-auth', token).send(user))
+    .catch(error => response.status(400).send(error));
 });
 
 app.listen(port, () => console.log(`Server: http://localhost:${port}`));

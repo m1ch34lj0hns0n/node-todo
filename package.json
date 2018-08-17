@@ -1,12 +1,12 @@
 {
-  "name": "to-do",
+  "name": "to-do-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simple nodejs to-do api",
   "main": "app.js",
   "scripts": {
     "build": "nodemon server/app.js"
   },
-  "author": "",
+  "author": "Mike Johnson (https://mikejohnson.uk)",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",

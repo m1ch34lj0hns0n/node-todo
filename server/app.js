@@ -46,7 +46,6 @@ app.get('/api/todos/:id', authenticate, (request, response) => {
         _id: id,
         _creator: request.user._id
     }).then(todo => {
-        console.log('todo', todo);
         if(!todo) return response.status(404).send();
         response.send({
             todo,

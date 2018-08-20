@@ -16,17 +16,20 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.post('/api/todos', (request, response) => {
+app.post('/api/todos', authenticate, (request, response) => {
     const todo = new Todo({
-        text: request.body.text
+        text: request.body.text,
+        _creator: request.user._id
     });
     todo.save().then(document => {
         response.send(document);
     }, error => response.status(400).send(error));
 });
 
-app.get('/api/todos', (request, response) => {
-    Todo.find().then(todos => {
+app.get('/api/todos', authenticate, (request, response) => {
+    Todo.find({
+        _creator: request.user._id
+    }).then(todos => {
         response.send({
             todos,
             status: 'ok'
@@ -34,12 +37,16 @@ app.get('/api/todos', (request, response) => {
     }, error => response.status(400).send(error));
 });
 
-app.get('/api/todos/:id', (request, response) => {
+app.get('/api/todos/:id', authenticate, (request, response) => {
     const id = request.params.id;
     if(!ObjectID.isValid(id)) {
         response.status(404).send();
     }
-    Todo.findById(id).then(todo => {
+    Todo.findOne({
+        _id: id,
+        _creator: request.user._id
+    }).then(todo => {
+        console.log('todo', todo);
         if(!todo) return response.status(404).send();
         response.send({
             todo,
@@ -48,12 +55,16 @@ app.get('/api/todos/:id', (request, response) => {
     }).catch(error => response.status(404).send());
 });
 
-app.delete('/api/todos/:id', (request, response) => {
+app.delete('/api/todos/:id', authenticate, (request, response) => {
     const id = request.params.id;
     if(!ObjectID.isValid(id)) {
         response.status(404).send();
     }
-    Todo.findByIdAndRemove(id).then(todo => {
+    Todo.findOneAndRemove({
+        _id: id,
+        _creator: request.user._id
+    }).then(todo => {
+        console.log(todo);
         if(!todo) return response.status(404).send();
         response.send({
             todo,
@@ -74,7 +85,10 @@ app.patch('/api/todos/:id', (request, response) => {
         todo.completed = false;
         todo.completedAt = null;
     }
-    Todo.findOneAndUpdate(id, {
+    Todo.findOneAndUpdate({
+        _id: id,
+        _creator: request.user._id
+    }, {
         $set: todo
     }, {
         new: true
